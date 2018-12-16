@@ -140,6 +140,66 @@ class Blockchain{
     })
   }
 
+  // Additional functionalities
+  // Now that we have our application working, it is time to add some functionalities that allow users to retrieve the data stored in the blockchain dataset.
+
+  // 1. Get star block by hash with JSON response
+  // The first step is modify your LevelDB methods to include a method that search for the block that has the hash that we are looking for. Check on this example:
+  // Get block by hash
+     getBlockByHash(hash) {
+         let self = this;
+         let block = null;
+         return new Promise(function(resolve, reject){
+             self.db.createReadStream()
+             .on('data', function (data) {
+                 if(data.hash === hash){
+                     block = data;
+                 }
+             })
+             .on('error', function (err) {
+                 reject(err)
+             })
+             .on('close', function () {
+                 resolve(block);
+             });
+         });
+     }
+
+  // Use this CURL example as a request:
+  // Curl request
+  // curl "http://localhost:8000/stars/hash:a59e9e399bc17c2db32a7a87379a8012f2c8e08dd661d7c0a6a4845d4f3ffb9f"
+
+  // Then create an endpoint to call the method and return the block object.
+  // Tip: Make sure that each time you are returning a block you need to decode the star’s story.
+
+  // 2. Get star block by wallet address
+  // Create the getBlockByWalletAddress(address) method using db.createReadStream() method from LevelDB.
+  // Tip: In this case you can have more than one block with stars registered by one user, so pay attention that you are going to return an array.
+  // Tip: Make sure that each time you are returning a block you need to decode the star’s story.
+
+  // 3. Get star block by height
+  // Create the getBlockByHeight(height) method using db.createReadStream() if the key you are using to store data in LevelDB otherwise you can just use:
+  // Get data from levelDB with key (Promise)
+      getLevelDBData(key){
+          let self = this;
+          return new Promise(function(resolve, reject) {
+              self.db.get(key, (err, value) => {
+                  if(err){
+                      if (err.type == 'NotFoundError') {
+                          resolve(undefined);
+                      }else {
+                          console.log('Block ' + key + ' get failed', err);
+                          reject(err);
+                      }
+                  }else {
+                      resolve(value);
+                  }
+              });
+          });
+      }
+
+  // Tip: Make sure that each time you are returning a block you need to decode the star’s story.
+
 }
 
 module.exports = Blockchain;
