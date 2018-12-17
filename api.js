@@ -58,17 +58,33 @@ app.post('/block', async (req, res) => {
 })
 
 app.post('/requestValidation', async (req, res) => {
+  try {
 
+  } catch (error) {
+
+  }
 })
 
 app.post('/message-signature/validate', async (req, res) => {
+  try {
 
+  } catch (error) {
+
+  }
 })
 
-app.get('/stars/address', async (req, res) => {
+app.get('/stars/:address', async (req, res) => {
+  try {
 
+  } catch (error) {
+
+  }
 })
 
-app.get('/stars/hash', async (req, res) =>{
+app.get('/stars/:hash', async (req, res) =>{
+  try {
 
+  } catch (error) {
+
+  }
 })
