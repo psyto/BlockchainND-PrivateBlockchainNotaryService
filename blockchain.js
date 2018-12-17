@@ -18,8 +18,8 @@ const db = level(chainDB);
 |  Class with a constructor for new blockchain 		|
 |  ================================================*/
 
-class Blockchain{
-  constructor(){
+class Blockchain {
+  constructor() {
     // Genesis block persist as the first block in the blockchain using LevelDB.
     this.getBlockHeight().then((height) => {
       if (height === -1) {
@@ -29,15 +29,15 @@ class Blockchain{
   }
 
   // addBlock(newBlock) includes a method to store newBlock within LevelDB.
-  async addBlock(newBlock){
+  async addBlock(newBlock) {
     // Previous block height
     const previousBlockHeight = parseInt(await this.getBlockHeight());
     // Block height
     newBlock.height = previousBlockHeight + 1;
     // UTC timestamp
-    newBlock.time = new Date().getTime().toString().slice(0,-3);
+    newBlock.time = new Date().getTime().toString().slice(0, -3);
     // previous block hash
-    if(newBlock.height>0){
+    if (newBlock.height > 0) {
       const previousBlock = await this.getBlock(previousBlockHeight);
       newBlock.previousBlockHash = previousBlock.hash;
     }
@@ -48,18 +48,18 @@ class Blockchain{
   }
 
   // getBlockHeight() function retrieves current block height within the LevelDB chain.
-  async getBlockHeight(){
+  async getBlockHeight() {
     return await this.getBlockHeightFromLevelDB();
   }
 
   // getBlock() function retrieves a block by block height within the LevelDB chain.
-  async getBlock(blockHeight){
+  async getBlock(blockHeight) {
     // return object as a single string
     return JSON.parse(await this.getLevelDBData(blockHeight));
   }
 
   // validate block() function to validate a block stored within levelDB.
-  async validateBlock(blockHeight){
+  async validateBlock(blockHeight) {
     // get block object
     let block = await this.getBlock(blockHeight);
     // get block hash
@@ -69,39 +69,39 @@ class Blockchain{
     // generate block hash
     let validBlockHash = SHA256(JSON.stringify(block)).toString();
     // Compare
-    if (blockHash===validBlockHash) {
+    if (blockHash === validBlockHash) {
       return true;
     } else {
-      console.log('Block #'+blockHeight+' invalid hash:\n'+blockHash+'<>'+validBlockHash);
+      console.log('Block #' + blockHeight + ' invalid hash:\n' + blockHash + '<>' + validBlockHash);
       return false;
     }
   }
 
   // validateChain() function to validate blockchain stored within levelDB.
-  async validateChain(){
+  async validateChain() {
     let errorLog = [];
     let blockHeight = await this.getBlockHeightFromLevelDB();
-    for (let i = 0; i < blockHeight-1; i++) {
+    for (let i = 0; i < blockHeight - 1; i++) {
       // validate block
       let isValid = await this.validateBlock(i);
       if (!isValid) errorLog.push(i);
       // compare blocks hash link
       let blockHash = await this.getBlock(i).hash;
-      let previousHash = await this.getBlock(i+1).previousBlockHash;
-      if (blockHash!==previousHash) {
+      let previousHash = await this.getBlock(i + 1).previousBlockHash;
+      if (blockHash !== previousHash) {
         errorLog.push(i);
       }
     }
-    if (errorLog.length>0) {
+    if (errorLog.length > 0) {
       console.log('Block errors = ' + errorLog.length);
-      console.log('Blocks: '+errorLog);
+      console.log('Blocks: ' + errorLog);
     } else {
       console.log('No errors detected');
     }
   }
 
   // Add data to levelDB with key/value pair
-  addDataToLevelDB(key,value){
+  addDataToLevelDB(key, value) {
     return new Promise((resolve, reject) => {
       db.put(key, value, (err) => {
         if (err) {
@@ -114,7 +114,7 @@ class Blockchain{
   }
 
   // Get data from levelDB with key
-  getLevelDBData(key){
+  getLevelDBData(key) {
     return new Promise((resolve, reject) => {
       db.get(key, (err, value) => {
         if (err) {
@@ -127,7 +127,7 @@ class Blockchain{
   }
 
   // Get block height from levelDB
-  getBlockHeightFromLevelDB(){
+  getBlockHeightFromLevelDB() {
     return new Promise((resolve, reject) => {
       let height = -1;
       db.createReadStream().on('data', (data) => {
@@ -146,24 +146,24 @@ class Blockchain{
   // 1. Get star block by hash with JSON response
   // The first step is modify your LevelDB methods to include a method that search for the block that has the hash that we are looking for. Check on this example:
   // Get block by hash
-     getBlockByHash(hash) {
-         let self = this;
-         let block = null;
-         return new Promise(function(resolve, reject){
-             self.db.createReadStream()
-             .on('data', function (data) {
-                 if(data.hash === hash){
-                     block = data;
-                 }
-             })
-             .on('error', function (err) {
-                 reject(err)
-             })
-             .on('close', function () {
-                 resolve(block);
-             });
-         });
-     }
+  getBlockByHash(hash) {
+    let self = this;
+    let block = null;
+    return new Promise(function(resolve, reject) {
+      self.db.createReadStream()
+        .on('data', function(data) {
+          if (data.hash === hash) {
+            block = data;
+          }
+        })
+        .on('error', function(err) {
+          reject(err)
+        })
+        .on('close', function() {
+          resolve(block);
+        });
+    });
+  }
 
   // Use this CURL example as a request:
   // Curl request
@@ -176,27 +176,30 @@ class Blockchain{
   // Create the getBlockByWalletAddress(address) method using db.createReadStream() method from LevelDB.
   // Tip: In this case you can have more than one block with stars registered by one user, so pay attention that you are going to return an array.
   // Tip: Make sure that each time you are returning a block you need to decode the star’s story.
+  getBlockByWalletAddress(address) {
+
+  }
 
   // 3. Get star block by height
   // Create the getBlockByHeight(height) method using db.createReadStream() if the key you are using to store data in LevelDB otherwise you can just use:
   // Get data from levelDB with key (Promise)
-      getLevelDBData(key){
-          let self = this;
-          return new Promise(function(resolve, reject) {
-              self.db.get(key, (err, value) => {
-                  if(err){
-                      if (err.type == 'NotFoundError') {
-                          resolve(undefined);
-                      }else {
-                          console.log('Block ' + key + ' get failed', err);
-                          reject(err);
-                      }
-                  }else {
-                      resolve(value);
-                  }
-              });
-          });
-      }
+  getLevelDBData(key) {
+    let self = this;
+    return new Promise(function(resolve, reject) {
+      self.db.get(key, (err, value) => {
+        if (err) {
+          if (err.type == 'NotFoundError') {
+            resolve(undefined);
+          } else {
+            console.log('Block ' + key + ' get failed', err);
+            reject(err);
+          }
+        } else {
+          resolve(value);
+        }
+      });
+    });
+  }
 
   // Tip: Make sure that each time you are returning a block you need to decode the star’s story.
 
