@@ -56,3 +56,19 @@ app.post('/block', async (req, res) => {
   res.status(201).send(response)
   }
 })
+
+app.post('/requestValidation', async (req, res) => {
+
+})
+
+app.post('/message-signature/validate', async (req, res) => {
+
+})
+
+app.get('/stars/address', async (req, res) => {
+
+})
+
+app.get('/stars/hash', async (req, res) =>{
+
+})
